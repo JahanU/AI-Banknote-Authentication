@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
 @Author Jahan Ulhaque 
 Student ID: 201272455
 
@@ -22,94 +21,66 @@ Extra 20%
 """List of imports"""
 # Used to read data from a CSV file
 import pandas as pd  
-
 # Used to split data into training and test
 from sklearn.model_selection import train_test_split
-
 # Used to train with Decision Tree Classifier and k nearest neighbor
 from sklearn.tree import DecisionTreeClassifier  
 from sklearn.neighbors import KNeighborsClassifier
-
-# Used to dsplay the accuracy and confusion matrix
-from sklearn.metrics import accuracy_score, confusion_matrix 
-
+# Model evaluation: Used to dsplay the accuracy score, confusion matrix & Cross validation score
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.cross_validation import cross_val_score
+ # Used to display graphs
 import matplotlib.pyplot as plt
-
-
 
 print("Decision Tree:")
 """Step 1: Loading Data 10%"""
 # Using panda we are able to store and read the CSV data file
 bill_data = pd.read_csv("bill_authentication.csv")  
 
-# number of rows and columns in dataset:
-# Shows amount of records and total attributes for each record
-print("Amount of Entities: {},\nAmount of classes per entity: {}".format(bill_data.shape[0], bill_data.shape[1]))
-
 """Step 2: Training 30%"""
-# a - By using drop, we have removed the column "Class", which is the label. But kept the rest
-# a - Is the attribute set and Y contains corresponding labels
-# b - Contains only values from the Class column
+# x - By using drop, we have removed the column "Class", which is the label. But kept the rest
+# x - Is the attribute set and Y contains corresponding labels
+# y - Contains only values from the Class column
 x = bill_data.drop('Class', axis = 1) 
 y = bill_data['Class']
 
+"""Step 2.1: Code for training 10%"""
+# By using the DecisionTreeClassifer function, Which will take in data and use this to make predictions
+DTClassifier = DecisionTreeClassifier()
+
+# cv = 10 Fold cross validation, which is applied on the whole dataset (x, y). 
+# Using the Decision Tree Classifier.
+cv_score = cross_val_score(DTClassifier, x, y, cv = 10)
 
 # Randomly splits data into training and test sets.
 # Test set = 20% and Training set = 80%
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.20)  
 
-
-"""Step 2.1: Code for training 10%"""
-# By using the DecisionTreeClassifer function, Which will take in the training
-# data and use this to make predictions/
-# classifier = DecisionTreeClassifier().fit(a_train, b_train) 
-DTClassifier = DecisionTreeClassifier()
+# Training the classifier with the training data sample
 DTClassifier.fit(x_train, y_train) 
-# Classifier has been successfully trained
-
 
 """Step 2.2: Successful training 20% (I think) / Testing Classifier""" 
 # Classifier has been trained, now can try make predictions on the unseen test data
-# Testing classifier
+# Predicting the test sets results
 y_pred = DTClassifier.predict(x_test)  
+print("Test sample size and classes:", x_test.shape, "\n")
 
 
 """Step 3: Model evaluation"""
-print("Confusion Matrix:\n{}".format(confusion_matrix(y_test, y_pred)))
-print("\nAccuracy is: {}/1".format(accuracy_score(y_test, y_pred)) + "\n")
-
-
-"""Step 3.1: Explain your experimental design, 20%
-
-Here you need to explain which method you are using, 
-and how you design your evaluation
-experiments."""
-
-"""Step 3.2: Document your evaluation results, 20%
-
-You can get your mark of this part if you write down your experimental results"""
-"""
-Confusion matrix allows us to work out how many instances we predicted correctly and incorrectly.
-So, the bottom right value, and top left value shows us the predictions we got correct.
-the bottom left value, and top right valye shows us the predictions we got incorrectly.
-By totaling up the numbers from the confusion matrix, we get the total test instances.
-
-Given the accuracy high accuracy of this classifier, the incorrectly predicted values 
-will be very low.
--
-The "accuracy_score" funtions works by doing the following:
-    It will loop through the predicted data and the actual true data, and for every
-    correct answer(predicted correctly) it will store this value and divide by the amount of samples.
-    i.e, given a sample size of 300, and we predict 295 instances correctly,
-    then it will do 295/300, thus giving an accuracy socre of 0.983/1
-"""
+print("Model evaluation:")
+# number of rows and columns in dataset:
+# Shows amount of records and total attributes for each record
+print("Amount of Entities: {},\nAmount of classes per entity: {}".format(bill_data.shape[0], bill_data.shape[1]))
+print("\nConfusion Matrix:\n", (confusion_matrix(y_test, y_pred)))
+print("\nAccuracy on test sample is: {}/1".format(accuracy_score(y_test, y_pred)))
+print("\n10 Fold cross validation:\n", cv_score)
+print("\n10 Fold cross validation average/mean:\n",cv_score.mean()) # Displaying the average result from the 10 fold cross validation
 
 
 
 """ KNN """
-
-scores = [] # Stores the accuracy score of every KNN (Ranging from: 1 - 26)
-confusion = [] # Stores confusion matrix for each KNN iteration
+accuracy_scores = [] # Stores the accuracy score of every KNN (Ranging from: 1 - 26)
+confusion_list = [] # Stores confusion matrix for each KNN iteration
 
 for k in range(1, 26): # Looping through 1 - 26 N numbers to find the best KNN value
     """Step 2: Training 30%"""
@@ -117,38 +88,43 @@ for k in range(1, 26): # Looping through 1 - 26 N numbers to find the best KNN v
     knn = KNeighborsClassifier(n_neighbors = k) # Apply KNN classifier with a new KNN value every iteration
     knn.fit(x_train, y_train) # Training classifier
     
-    """Step 2.2: Successful training 20% (I think)""" 
+    """Step 2.2: Successful training 20% / Testing Classifier""" 
     y_pred = knn.predict(x_test) # Testing classifier
-    scores.append(accuracy_score(y_test, y_pred)) # Stores the accuracy score of every KNN iteration
-    confusion.append(confusion_matrix(y_test, y_pred)) # Stores the confusion matrix of every KNN iteration
+    accuracy_scores.append(accuracy_score(y_test, y_pred)) # Stores the accuracy score of every KNN iteration
+    confusion_list.append(confusion_matrix(y_test, y_pred)) # Stores the confusion matrix of every KNN iteration
     
 # Displays the accuracy score for each KNN value 
-plt.plot(range(1, 26), scores)
+# Used for testing 
+"""    
+plt.plot(range(1, 26), accuracy_scores)
 plt.title("Accuracy Scores for Values of k of k-Nearest-Neighbors")
 plt.xlabel("Values 1 - 26")
 plt.ylabel("Accuracy Score 0/1")
 plt.show()
+"""
 
-max_value = max(scores)
-max_index = scores.index(max_value)
-
-if max_index == 0:
+max_value = max(accuracy_scores) # Gets the highest accuracy score
+max_index = accuracy_scores.index(max_value)  # Gets the index of the highest accuracy score
+if max_index == 0: # Expected n_neighors should always be greater than 0, just incase it was not assigned a KNN value we will set it to 1
     max_index = 1
     
-knn = KNeighborsClassifier(n_neighbors = max_index) # Apply KNN classifier and number to knn var
+knn = KNeighborsClassifier(n_neighbors = max_index) # Apply KNN classifier and best KNN number
+cv_score = cross_val_score(knn, x, y, cv = 10) # Apply 10 Fold cross validation with the best KNN value
+knn.fit(x_train, y_train) # Training classifier (This is using the training and testing data)
 
-knn.fit(x_train, y_train) # Training classifier
-
-"""Step 2.2: Successful training 20% (I think) / Testing Classifier""" 
+"""Step 2.2: Successful training 20% / Testing Classifier""" 
 y_pred = knn.predict(x_test) # Testing classifier with the best KNN value on the test sample
- 
 
-print("KNN:")
-print("Amount of Entities: {},\nAmount of classes per entity: {}".format(bill_data.shape[0], bill_data.shape[1]))
+print("-\n-\nK nearest neighbour:")
+print("Amount of Entities: {},\nAmount of classes per entity: {}\n".format(bill_data.shape[0], bill_data.shape[1]))
 
 """Step 3: Model evaluation"""
+print("Model evaluation:")
 print("With a KNN of: {}".format(max_index))
-print("Confusion Matrix:\n{}".format(confusion[max_index]))
-print("\nAccuracy is: {}/1".format(max_value))
+print("Confusion Matrix:\n{}".format(confusion_list[max_index]))
+print("\nAccuracy on test sample is: {}/1".format(max_value))
+print("\n10 Fold cross validation:\n", cv_score)
+print("\n10 Fold cross validation average/mean:\n",cv_score.mean()) # Displaying the average result from the 10 fold cross validation
+
 
 
