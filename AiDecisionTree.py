@@ -27,12 +27,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier  
 from sklearn.neighbors import KNeighborsClassifier
 # Model evaluation: Used to dsplay the accuracy score, confusion matrix & Cross validation score
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 from sklearn.cross_validation import cross_val_score
- # Used to display graphs
+# Used to display graphs (Used for testing)
 import matplotlib.pyplot as plt
 
-print("Decision Tree:")
 """Step 1: Loading Data 10%"""
 # Using panda we are able to store and read the CSV data file
 bill_data = pd.read_csv("bill_authentication.csv")  
@@ -59,21 +58,24 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size = 0.20)
 # Training the classifier with the training data sample
 DTClassifier.fit(x_train, y_train) 
 
-"""Step 2.2: Successful training 20% (I think) / Testing Classifier""" 
+"""Step 2.2: Successful training 20%  / Testing Classifier""" 
 # Classifier has been trained, now can try make predictions on the unseen test data
 # Predicting the test sets results
 y_pred = DTClassifier.predict(x_test)  
-print("Test sample size and classes:", x_test.shape, "\n")
 
 
-"""Step 3: Model evaluation"""
-print("Model evaluation:")
+print("Decision Tree:")
 # number of rows and columns in dataset:
 # Shows amount of records and total attributes for each record
 print("Amount of Entities: {},\nAmount of classes per entity: {}".format(bill_data.shape[0], bill_data.shape[1]))
-print("\nConfusion Matrix:\n", (confusion_matrix(y_test, y_pred)))
-print("\nAccuracy on test sample is: {}/1".format(accuracy_score(y_test, y_pred)))
-print("\n10 Fold cross validation:\n", cv_score)
+print("Test sample size and classes:", x_test.shape, "\n")
+
+"""Step 3: Model evaluation"""
+print("Model evaluation:")
+print("\nConfusion Matrix:\n", (confusion_matrix(y_test, y_pred))) # Displays the confusion matrix
+print("\nAccuracy on test sample is: {}/1".format(accuracy_score(y_test, y_pred))) # Displays the accuracy
+print("\nClassification report:\n", classification_report(y_test, y_pred))  # Displays the classification report
+print("\n10 Fold cross validation:\n", cv_score) # Displays the 10 fold cross validation results
 print("\n10 Fold cross validation average/mean:\n",cv_score.mean()) # Displaying the average result from the 10 fold cross validation
 
 
@@ -95,7 +97,7 @@ for k in range(1, 26): # Looping through 1 - 26 N numbers to find the best KNN v
     
 # Displays the accuracy score for each KNN value 
 # Used for testing 
-"""    
+"""
 plt.plot(range(1, 26), accuracy_scores)
 plt.title("Accuracy Scores for Values of k of k-Nearest-Neighbors")
 plt.xlabel("Values 1 - 26")
@@ -116,15 +118,15 @@ knn.fit(x_train, y_train) # Training classifier (This is using the training and 
 y_pred = knn.predict(x_test) # Testing classifier with the best KNN value on the test sample
 
 print("-\n-\nK nearest neighbour:")
-print("Amount of Entities: {},\nAmount of classes per entity: {}\n".format(bill_data.shape[0], bill_data.shape[1]))
+print("Amount of Entities: {},\nAmount of classes per entity: {}".format(bill_data.shape[0], bill_data.shape[1]))
+print("Test sample size and classes:", x_test.shape, "\n")
 
 """Step 3: Model evaluation"""
 print("Model evaluation:")
 print("With a KNN of: {}".format(max_index))
-print("Confusion Matrix:\n{}".format(confusion_list[max_index]))
+print("\nConfusion Matrix:\n{}".format(confusion_list[max_index]))
 print("\nAccuracy on test sample is: {}/1".format(max_value))
+print("\nClassification report:\n", classification_report(y_test, y_pred))  
 print("\n10 Fold cross validation:\n", cv_score)
-print("\n10 Fold cross validation average/mean:\n",cv_score.mean()) # Displaying the average result from the 10 fold cross validation
-
-
+print("\n10 Fold cross validation average/mean:\n",cv_score.mean())
 
