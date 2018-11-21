@@ -16,7 +16,9 @@ Step 3.1: Explain your expermental design
 Step 3.2 Document your evaluation results
 
 Extra 20%
-"""
+
+How to run:
+Please read the “README-How_to_run” file contained within the folder."""
 
 """List of imports"""
 # Used to read data from a CSV file
@@ -34,11 +36,11 @@ import matplotlib.pyplot as plt
 
 """Step 1: Loading Data 10%"""
 # Using panda we are able to store and read the CSV data file
-bill_data = pd.read_csv("bill_authentication.csv")  
+bill_data = pd.read_csv("banknote_authentication.csv")  
 
 """Step 2: Training 30%"""
 # x - By using drop, we have removed the column "Class", which is the label. But kept the rest
-# x - Is the attribute set and Y contains corresponding labels
+# x - Is the attribute set and y contains corresponding labels
 # y - Contains only values from the Class column
 x = bill_data.drop('Class', axis = 1) 
 y = bill_data['Class']
@@ -60,9 +62,8 @@ DTClassifier.fit(x_train, y_train)
 
 """Step 2.2: Successful training 20%  / Testing Classifier""" 
 # Classifier has been trained, now can try make predictions on the unseen test data
-# Predicting the test sets results
+# Predicting on the test sample
 y_pred = DTClassifier.predict(x_test)  
-
 
 print("Decision Tree:")
 # number of rows and columns in dataset:
@@ -112,7 +113,7 @@ if max_index == 0: # Expected n_neighors should always be greater than 0, just i
     
 knn = KNeighborsClassifier(n_neighbors = max_index) # Apply KNN classifier and best KNN number
 cv_score = cross_val_score(knn, x, y, cv = 10) # Apply 10 Fold cross validation with the best KNN value
-knn.fit(x_train, y_train) # Training classifier (This is using the training and testing data)
+knn.fit(x_train, y_train) # Training classifier (This is using the training data)
 
 """Step 2.2: Successful training 20% / Testing Classifier""" 
 y_pred = knn.predict(x_test) # Testing classifier with the best KNN value on the test sample
